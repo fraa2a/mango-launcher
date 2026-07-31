@@ -1,0 +1,25 @@
+.vscode/
+node_modules/
+__pycache__
+dist
+out
+.DS_Store
+*.log*
+*.tsbuildinfo
+.env
+.vite
+ludusavi/**
+!ludusavi/config.yaml
+mango-python-rpc/
+/mango-native/
+native/mango-native/target/
+.python-version
+
+# Sentry Config File
+.env.sentry-build-plugin
+
+*storybook.log
+Future-updates.md
+TO-DO.md
+.planning/
+.claude/

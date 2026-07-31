@@ -1,0 +1,6 @@
+LICENSE
+README.md
+src/mango_python_rpc.egg-info/PKG-INFO
+src/mango_python_rpc.egg-info/SOURCES.txt
+src/mango_python_rpc.egg-info/dependency_links.txt
+src/mango_python_rpc.egg-info/top_level.txt

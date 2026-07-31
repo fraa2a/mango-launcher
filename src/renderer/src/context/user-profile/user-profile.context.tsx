@@ -1,0 +1,286 @@
+import { darkenColor, ensureArray } from "@renderer/helpers";
+import { useToast } from "@renderer/hooks";
+import type { Badge, UserProfile, UserStats, UserGame } from "@types";
+import { average } from "color.js";
+
+import { createContext, useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
+export interface UserProfileContext {
+  userProfile: UserProfile | null;
+  heroBackground: string;
+  /* Indicates if the current user is viewing their own profile */
+  isMe: boolean;
+  userStats: UserStats | null;
+  getUserProfile: () => Promise<void>;
+  getUserStats: (shops?: string[]) => Promise<void>;
+  getUserLibraryGames: (
+    sortBy?: string,
+    reset?: boolean,
+    shops?: string[]
+  ) => Promise<void>;
+  loadMoreLibraryGames: (sortBy?: string, shops?: string[]) => Promise<boolean>;
+  setSelectedBackgroundImage: React.Dispatch<React.SetStateAction<string>>;
+  backgroundImage: string;
+  badges: Badge[];
+  libraryGames: UserGame[];
+  pinnedGames: UserGame[];
+  hasMoreLibraryGames: boolean;
+  isLoadingLibraryGames: boolean;
+}
+
+export const DEFAULT_USER_PROFILE_BACKGROUND = "#151515B3";
+
+export const userProfileContext = createContext<UserProfileContext>({
+  userProfile: null,
+  heroBackground: DEFAULT_USER_PROFILE_BACKGROUND,
+  isMe: false,
+  userStats: null,
+  getUserProfile: async () => {},
+  getUserStats: async (_shops?: string[]) => {},
+  getUserLibraryGames: async (
+    _sortBy?: string,
+    _reset?: boolean,
+    _shops?: string[]
+  ) => {},
+  loadMoreLibraryGames: async (_sortBy?: string, _shops?: string[]) => false,
+  setSelectedBackgroundImage: () => {},
+  backgroundImage: "",
+  badges: [],
+  libraryGames: [],
+  pinnedGames: [],
+  hasMoreLibraryGames: false,
+  isLoadingLibraryGames: false,
+});
+
+const { Provider } = userProfileContext;
+export const { Consumer: UserProfileContextConsumer } = userProfileContext;
+
+export interface UserProfileContextProviderProps {
+  children: React.ReactNode;
+  userId: string;
+}
+
+export function UserProfileContextProvider({
+  children,
+  userId,
+}: Readonly<UserProfileContextProviderProps>) {
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [libraryGames, setLibraryGames] = useState<UserGame[]>([]);
+  const [pinnedGames, setPinnedGames] = useState<UserGame[]>([]);
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [heroBackground, setHeroBackground] = useState(
+    DEFAULT_USER_PROFILE_BACKGROUND
+  );
+  const [, setSelectedBackgroundImage] = useState("");
+  const [libraryPage, setLibraryPage] = useState(0);
+  const [hasMoreLibraryGames, setHasMoreLibraryGames] = useState(true);
+  const [isLoadingLibraryGames, setIsLoadingLibraryGames] = useState(false);
+  const previousUserIdRef = useRef(userId);
+
+  const isMe = false;
+
+  const getHeroBackgroundFromImageUrl = async (imageUrl: string) => {
+    const output = await average(imageUrl, { amount: 1, format: "hex" });
+
+    return `linear-gradient(135deg, ${darkenColor(output as string, 0.5)}, ${darkenColor(output as string, 0.6, 0.5)})`;
+  };
+
+  const getBackgroundImageUrl = () => {
+    if (userProfile?.backgroundImageUrl) return userProfile.backgroundImageUrl;
+
+    return "";
+  };
+
+  const { t, i18n } = useTranslation("user_profile");
+
+  const { showErrorToast } = useToast();
+  const navigate = useNavigate();
+
+  const getUserStats = useCallback(
+    async (shops = ["steam", "launchbox"]) => {
+      const params = new URLSearchParams();
+      shops.forEach((shop) => params.append("shop", shop));
+
+      window.electron.mangoApi
+        .get<UserStats>(`/users/${userId}/stats?${params.toString()}`)
+        .then((stats) => {
+          setUserStats(stats);
+        });
+    },
+    [userId]
+  );
+
+  const getUserLibraryGames = useCallback(
+    async (sortBy?: string, reset = true, shops = ["steam", "launchbox"]) => {
+      if (reset) {
+        setLibraryPage(0);
+        setHasMoreLibraryGames(true);
+        setIsLoadingLibraryGames(true);
+      }
+
+      try {
+        const params = new URLSearchParams();
+        params.append("take", "12");
+        params.append("skip", "0");
+        shops.forEach((shop) => params.append("shop", shop));
+        if (sortBy) {
+          params.append("sortBy", sortBy);
+        }
+
+        const url = `/users/${userId}/library?${params.toString()}`;
+
+        const response = await window.electron.mangoApi.get<{
+          library: UserGame[];
+          pinnedGames: UserGame[];
+        }>(url);
+
+        if (response) {
+          setLibraryGames(response.library);
+          setPinnedGames(response.pinnedGames);
+          setHasMoreLibraryGames(response.library.length === 12);
+        } else {
+          setLibraryGames([]);
+          setPinnedGames([]);
+          setHasMoreLibraryGames(false);
+        }
+      } catch (error) {
+        setLibraryGames([]);
+        setPinnedGames([]);
+        setHasMoreLibraryGames(false);
+      } finally {
+        setIsLoadingLibraryGames(false);
+      }
+    },
+    [userId]
+  );
+
+  const loadMoreLibraryGames = useCallback(
+    async (
+      sortBy?: string,
+      shops = ["steam", "launchbox"]
+    ): Promise<boolean> => {
+      if (isLoadingLibraryGames || !hasMoreLibraryGames) {
+        return false;
+      }
+
+      setIsLoadingLibraryGames(true);
+      try {
+        const nextPage = libraryPage + 1;
+        const params = new URLSearchParams();
+        params.append("take", "12");
+        params.append("skip", String(nextPage * 12));
+        shops.forEach((shop) => params.append("shop", shop));
+        if (sortBy) {
+          params.append("sortBy", sortBy);
+        }
+
+        const url = `/users/${userId}/library?${params.toString()}`;
+
+        const response = await window.electron.mangoApi.get<{
+          library: UserGame[];
+          pinnedGames: UserGame[];
+        }>(url);
+
+        if (response && response.library.length > 0) {
+          setLibraryGames((prev) => {
+            const existingIds = new Set(prev.map((game) => game.objectId));
+            const newGames = response.library.filter(
+              (game) => !existingIds.has(game.objectId)
+            );
+            return [...prev, ...newGames];
+          });
+          setLibraryPage(nextPage);
+          setHasMoreLibraryGames(response.library.length === 12);
+          return true;
+        } else {
+          setHasMoreLibraryGames(false);
+          return false;
+        }
+      } catch (error) {
+        setHasMoreLibraryGames(false);
+        return false;
+      } finally {
+        setIsLoadingLibraryGames(false);
+      }
+    },
+    [userId, libraryPage, hasMoreLibraryGames, isLoadingLibraryGames]
+  );
+
+  const getUserProfile = useCallback(async () => {
+    getUserStats();
+    getUserLibraryGames();
+
+    const profileParams = new URLSearchParams();
+    profileParams.append("shop", "steam");
+    profileParams.append("shop", "launchbox");
+
+    return window.electron.mangoApi
+      .get<UserProfile>(`/users/${userId}?${profileParams.toString()}`)
+      .then((userProfile) => {
+        setUserProfile(userProfile);
+
+        if (userProfile.profileImageUrl) {
+          getHeroBackgroundFromImageUrl(userProfile.profileImageUrl).then(
+            (color) => setHeroBackground(color)
+          );
+        }
+      })
+      .catch(() => {
+        showErrorToast(t("user_not_found"));
+        navigate(-1);
+      });
+  }, [navigate, getUserStats, getUserLibraryGames, showErrorToast, userId, t]);
+
+  const getBadges = useCallback(async () => {
+    const language = i18n.language.split("-")[0];
+    const params = new URLSearchParams({ locale: language });
+
+    const badges = await window.electron.mangoApi.get<Badge[]>(
+      `/badges?${params.toString()}`
+    );
+    setBadges(ensureArray<Badge>(badges, "/badges"));
+  }, [i18n]);
+
+  useEffect(() => {
+    if (previousUserIdRef.current !== userId) {
+      previousUserIdRef.current = userId;
+      setUserProfile(null);
+      setLibraryGames([]);
+      setPinnedGames([]);
+      setHeroBackground(DEFAULT_USER_PROFILE_BACKGROUND);
+      setLibraryPage(0);
+      setHasMoreLibraryGames(true);
+    }
+
+    getUserProfile();
+    getBadges();
+  }, [getUserProfile, getBadges, userId]);
+
+  return (
+    <Provider
+      value={{
+        userProfile,
+        heroBackground,
+        isMe,
+        getUserProfile,
+        getUserStats,
+        getUserLibraryGames,
+        loadMoreLibraryGames,
+        setSelectedBackgroundImage,
+        backgroundImage: getBackgroundImageUrl(),
+        userStats,
+        badges,
+        libraryGames,
+        pinnedGames,
+        hasMoreLibraryGames,
+        isLoadingLibraryGames,
+      }}
+    >
+      {children}
+    </Provider>
+  );
+}
