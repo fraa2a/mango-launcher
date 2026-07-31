@@ -1,47 +1,35 @@
 import updater, { UpdateInfo } from "electron-updater";
 import { logger, WindowManager } from "@main/services";
-import { AppUpdaterEvent, UserPreferences } from "@types";
+import { AppUpdaterEvent } from "@types";
 import { app } from "electron";
 import { publishNotificationUpdateReadyToInstall } from "@main/services/notifications";
-import { db, levelKeys } from "@main/level";
 
 const { autoUpdater } = updater;
 const sendEventsForDebug = false;
+const GITHUB_REPO = "fraa2a/mango-launcher";
 
 export class UpdateManager {
   private static hasNotified = false;
   private static newVersion = "";
 
   private static mockValuesForDebug() {
-    this.sendEvent({ type: "update-available", info: { version: "3.3.1" } });
-    this.sendEvent({ type: "update-downloaded" });
+    if (process.platform === "linux") {
+      this.sendEvent({ type: "update-available", info: { version: "3.3.1" }, aur: true });
+    } else {
+      this.sendEvent({ type: "update-available", info: { version: "3.3.1" } });
+      this.sendEvent({ type: "update-downloaded" });
+    }
   }
 
   private static sendEvent(event: AppUpdaterEvent) {
     WindowManager.mainWindow?.webContents.send("autoUpdaterEvent", event);
   }
 
-  private static async isAutoInstallEnabled() {
-    if (process.platform === "darwin") return false;
-    if (process.platform === "win32") {
-      return process.env.PORTABLE_EXECUTABLE_FILE == null;
-    }
-
-    if (process.platform === "linux") {
-      const userPreferences = await db.get<string, UserPreferences | null>(
-        levelKeys.userPreferences,
-        {
-          valueEncoding: "json",
-        }
-      );
-
-      return userPreferences?.enableAutoInstall === true;
-    }
-
-    return false;
-  }
-
   public static async checkForUpdates() {
+    if (process.platform === "linux") {
+      return this.checkForUpdatesAur();
+    }
+
     autoUpdater
       .removeAllListeners()
       .on("update-available", (info: UpdateInfo) => {
@@ -57,7 +45,9 @@ export class UpdateManager {
         }
       });
 
-    const isAutoInstallAvailable = await this.isAutoInstallEnabled();
+    const isAutoInstallAvailable =
+      process.platform !== "darwin" &&
+      (process.platform !== "win32" || process.env.PORTABLE_EXECUTABLE_FILE == null);
 
     if (app.isPackaged) {
       autoUpdater.autoDownload = isAutoInstallAvailable;
@@ -69,5 +59,29 @@ export class UpdateManager {
     }
 
     return isAutoInstallAvailable;
+  }
+
+  private static async checkForUpdatesAur() {
+    try {
+      const response = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`
+      );
+      if (!response.ok) return false;
+
+      const data = await response.json();
+      const latestTag: string = data.tag_name || "";
+      const latestVersion = latestTag.replace(/^v/, "");
+
+      if (latestVersion && latestVersion !== app.getVersion()) {
+        this.sendEvent({
+          type: "update-available",
+          info: { version: latestVersion },
+          aur: true,
+        });
+      }
+    } catch (error) {
+      logger.error("Failed to check for AUR updates", error);
+    }
+    return false;
   }
 }

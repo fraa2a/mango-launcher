@@ -22,14 +22,11 @@ import { loadCriticalState, runDeferredStartup } from "./main";
 
 const { autoUpdater } = updater;
 
-// TODO(mango): auto-update feed disabled during rebrand. Point this at the
-// Mango release repository before re-enabling, otherwise the app would pull
-// updates from Hydra's repo and overwrite itself with the upstream client.
-// autoUpdater.setFeedURL({
-//   provider: "github",
-//   owner: "hydralauncher",
-//   repo: "hydra",
-// });
+autoUpdater.setFeedURL({
+  provider: "github",
+  owner: "fraa2a",
+  repo: "mango-launcher",
+});
 
 autoUpdater.logger = logger;
 
@@ -89,6 +86,16 @@ if (process.defaultApp) {
   }
 } else {
   app.setAsDefaultProtocolClient(PROTOCOL);
+}
+
+if (!app.isPackaged && process.platform === "win32") {
+  import("node:child_process").then(({ exec }) => {
+    const appPath = process.execPath.replace(/\\/g, "\\\\");
+    exec(
+      `reg add HKCU\\Software\\Classes\\.mangocds /ve /d MangoLauncher.mangocds /f && ` +
+      `reg add HKCU\\Software\\Classes\\MangoLauncher.mangocds\\shell\\open\\command /ve /d "${appPath}" "%1" /f`
+    );
+  });
 }
 
 const initializeApp = async () => {

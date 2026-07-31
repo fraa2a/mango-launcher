@@ -1,0 +1,114 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release-notes:
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.gen-changelog.outputs.changelog }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: gen-changelog
+        run: |
+          PREV_TAG=$(git tag --sort=-version:refname | head -2 | tail -1 || echo "")
+          if [ -z "$PREV_TAG" ]; then
+            CHANGELOG="Initial release"
+          else
+            CHANGELOG=$(git log --oneline --no-decorate "$PREV_TAG..HEAD" 2>/dev/null || git log --oneline --no-decorate -10)
+          fi
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          echo "changelog=$CHANGELOG" >> "$GITHUB_OUTPUT"
+
+  build-linux:
+    needs: release-notes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "yarn"
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools p7zip-full
+
+      - name: Create Python venv
+        run: |
+          python -m venv .venv-py13
+          .venv-py13/bin/pip install -r requirements.txt
+
+      - name: Install JS deps
+        run: yarn install --frozen-lockfile
+
+      - name: Build native addon
+        run: node scripts/build-native-addon.cjs
+
+      - name: Build Python RPC
+        run: yarn build:python-rpc
+
+      - name: Build and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn build
+          yarn electron-builder --linux --publish always
+
+  build-windows:
+    needs: release-notes
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "yarn"
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install JS deps
+        run: yarn install --frozen-lockfile
+
+      - name: Build native addon
+        run: node scripts/build-native-addon.cjs
+
+      - name: Build and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn electron-vite build
+          yarn electron-builder --win --publish always
+
+  create-release:
+    needs: [release-notes, build-linux, build-windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ needs.release-notes.outputs.changelog }}
+          generate_release_notes: true

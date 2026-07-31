@@ -23,14 +23,14 @@ const s3 = new S3Client({
 
 const dist = path.resolve(__dirname, "..", "dist");
 
-const extensionsToUpload = [".deb", ".exe", ".AppImage"];
+const suffixesToUpload = [".deb", ".exe", ".rpm", ".tar.gz"];
 
 fs.readdir(dist, async (err, files) => {
   if (err) throw err;
 
   const uploads = await Promise.all(
     files
-      .filter((file) => extensionsToUpload.includes(path.extname(file)))
+      .filter((file) => suffixesToUpload.some((s) => file.endsWith(s)))
       .map(async (file) => {
         console.log(`⌛️ Uploading ${file}...`);
         const fileName = `${flavor}-${new Date().getTime()}-${file}`;

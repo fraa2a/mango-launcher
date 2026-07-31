@@ -6,12 +6,15 @@ import "./auto-update-header.scss";
 import type { AppUpdaterEvent } from "@types";
 
 export const releasesPageUrl =
-  "https://github.com/hydralauncher/hydra/releases/latest";
+  "https://github.com/fraa2a/mango-launcher/releases/latest";
+
+export const aurPageUrl = "https://aur.archlinux.org/packages/mangolauncher-bin";
 
 export function AutoUpdateSubHeader() {
   const [isReadyToInstall, setIsReadyToInstall] = useState(false);
   const [newVersion, setNewVersion] = useState<string | null>(null);
   const [isAutoInstallAvailable, setIsAutoInstallAvailable] = useState(false);
+  const [isAur, setIsAur] = useState(false);
 
   const { t } = useTranslation("header");
 
@@ -24,6 +27,7 @@ export function AutoUpdateSubHeader() {
       (event: AppUpdaterEvent) => {
         if (event.type == "update-available") {
           setNewVersion(event.info.version);
+          if (event.aur) setIsAur(true);
         }
 
         if (event.type == "update-downloaded") {
@@ -42,6 +46,23 @@ export function AutoUpdateSubHeader() {
   }, []);
 
   if (!newVersion) return null;
+
+  if (isAur) {
+    return (
+      <header className="auto-update-sub-header">
+        <Link
+          to={aurPageUrl}
+          className="auto-update-sub-header__new-version-link"
+        >
+          <SyncIcon
+            className="auto-update-sub-header__new-version-icon"
+            size={12}
+          />
+          {t("version_available_download", { version: newVersion })} (AUR)
+        </Link>
+      </header>
+    );
+  }
 
   if (!isAutoInstallAvailable) {
     return (

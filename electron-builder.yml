@@ -64,23 +64,26 @@ linux:
     - from: binaries/7zzs
     - from: binaries/umu/umu-run
   target:
-    - AppImage
-    - snap
-    - deb
-    - rpm
-  maintainer: electronjs.org
+    - target: deb
+      arch:
+        - x64
+    - target: rpm
+      arch:
+        - x64
+    - target: tar.gz
+      arch:
+        - x64
+  artifactName: ${name}-${version}.${ext}
+  maintainer: fraa2a
   category: Game
   mimeTypes:
     - x-scheme-handler/mangolauncher
     - application/x-mango-custom-download-source
-appImage:
-  artifactName: ${name}-${version}.${ext}
 npmRebuild: false
-# TODO(mango): publish target disabled during rebrand. Configure the Mango
-# release repository before re-enabling so updates are not pulled from Hydra.
-# publish:
-#   provider: github
-#   owner: hydralauncher
-#   repo: hydra
+publish:
+  provider: github
+  owner: fraa2a
+  repo: mango-launcher
+  releaseType: release
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
