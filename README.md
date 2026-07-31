@@ -21,8 +21,6 @@
 - Play your classic games through **Mango Classics**: set up emulation for your consoles, configure ROM folders, and review your library
   - Mango never downloads or distributes ROMs or BIOS files — your library, your responsibility
 - Manage memory cards and save states for your emulated games
-- Sync achievements from emulator and classic games via **RetroAchievements**
-- Save your game progress in the cloud with **Mango Cloud**
 - Unlock achievements and get notified as you play
 - Enjoy a console-style interface with **Big Picture** mode
 - Import custom download sources from `.mangocds` files or the `mangolauncher://install-source` browser integration — see [docs/mangocds.md](docs/mangocds.md)
