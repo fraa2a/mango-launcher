@@ -8,7 +8,7 @@ import type { AppUpdaterEvent } from "@types";
 export const releasesPageUrl =
   "https://github.com/fraa2a/mango-launcher/releases/latest";
 
-export const aurPageUrl = "https://aur.archlinux.org/packages/mangolauncher-bin";
+export const aurPageUrl = "https://aur.archlinux.org/packages/mango-launcher-bin";
 
 export function AutoUpdateSubHeader() {
   const [isReadyToInstall, setIsReadyToInstall] = useState(false);

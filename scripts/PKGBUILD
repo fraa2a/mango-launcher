@@ -1,8 +1,8 @@
 # Maintainer: fraa2a <fraa2a@users.noreply.github.com>
 # AUR binary package for Mango Launcher
-# https://aur.archlinux.org/packages/mangolauncher-bin
+# https://aur.archlinux.org/packages/mango-launcher-bin
 
-pkgname=mangolauncher-bin
+pkgname=mango-launcher-bin
 pkgver=2.0.0
 pkgrel=1
 pkgdesc="Mango Launcher - An open-source gaming platform"
@@ -15,7 +15,7 @@ depends=(
   'libnotify'
   'ttf-font'
 )
-conflicts=('mangolauncher')
+conflicts=('mangolauncher' 'mangolauncher-bin')
 provides=('mangolauncher')
 source=(
   "https://github.com/fraa2a/mango-launcher/releases/download/v${pkgver}/mango-launcher-${pkgver}.tar.gz"
