@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import { Button } from "@renderer/components";
-import { PlayIcon } from "@primer/octicons-react";
+import { PlayIcon, PlusIcon } from "@primer/octicons-react";
 
 import { buildGameDetailsPath } from "@renderer/helpers";
 import { useLibrary } from "@renderer/hooks/use-library";
@@ -96,6 +96,9 @@ export default function Home() {
     return (
       <section className="home__content">
         <div className="home__empty">
+          <div className="home__empty-icon">
+            <PlusIcon size={24} />
+          </div>
           <h2 className="home__empty-title">{t("welcome_title")}</h2>
           <p className="home__empty-text">{t("welcome_text")}</p>
         </div>
@@ -110,7 +113,7 @@ export default function Home() {
           <div
             className="home__continue-art"
             style={{
-              backgroundImage: `linear-gradient(90deg, rgba(14, 16, 21, 0.96), rgba(14, 16, 21, 0.35)), url(${heroImage(lastPlayedGame)})`,
+              backgroundImage: `linear-gradient(90deg, rgba(18, 18, 18, 0.96), rgba(18, 18, 18, 0.35)), url(${heroImage(lastPlayedGame)})`,
             }}
           >
             <div>
