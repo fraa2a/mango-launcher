@@ -1,5 +1,6 @@
 # Maintainer: fraa2a <fraa2a@users.noreply.github.com>
 # AUR binary package for Mango Launcher
+# https://aur.archlinux.org/packages/mangolauncher-bin
 
 pkgname=mangolauncher-bin
 pkgver=2.0.0
@@ -16,15 +17,17 @@ depends=(
 )
 conflicts=('mangolauncher')
 provides=('mangolauncher')
-source=("https://github.com/fraa2a/mango-launcher/releases/download/v${pkgver}/mango-launcher-${pkgver}.tar.gz")
-sha256sums=('SKIP')
+source=(
+  "https://github.com/fraa2a/mango-launcher/releases/download/v${pkgver}/mango-launcher-${pkgver}.tar.gz"
+  "https://raw.githubusercontent.com/fraa2a/mango-launcher/v${pkgver}/build/icons/512x512.png"
+)
+sha256sums=('SKIP' 'SKIP')
 
 package() {
   install -d "$pkgdir/opt/mangolauncher"
   tar -xzf "$srcdir/mango-launcher-${pkgver}.tar.gz" -C "$pkgdir/opt/mangolauncher"
 
-  find "$pkgdir/opt/mangolauncher" -type f -name "*.so*" -exec chmod 755 {} \;
-  find "$pkgdir/opt/mangolauncher" -type f -name "mango-launcher" -exec chmod 755 {} \;
+  find "$pkgdir/opt/mangolauncher" -type f \( -name "*.so*" -o -name "mango-launcher" -o -name "chrome-sandbox" \) -exec chmod 755 {} \;
 
   install -d "$pkgdir/usr/bin"
   ln -sf "/opt/mangolauncher/mango-launcher" "$pkgdir/usr/bin/mangolauncher"
@@ -56,7 +59,7 @@ EOF
 EOF
 
   install -d "$pkgdir/usr/share/icons/hicolor/512x512/apps"
-  install -Dm644 "$srcdir/mangolauncher.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/mangolauncher.png"
+  install -m644 "$srcdir/512x512.png" "$pkgdir/usr/share/icons/hicolor/512x512/apps/mangolauncher.png"
 }
 
 post_install() {
