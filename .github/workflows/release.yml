@@ -31,18 +31,8 @@ jobs:
           CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
           echo "changelog=$CHANGELOG" >> "$GITHUB_OUTPUT"
 
-  create-release:
-    needs: release-notes
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: softprops/action-gh-release@v2
-        with:
-          body: ${{ needs.release-notes.outputs.changelog }}
-          generate_release_notes: true
-
   build-linux:
-    needs: [release-notes, create-release]
+    needs: release-notes
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +75,7 @@ jobs:
           yarn electron-builder --linux --publish always
 
   build-windows:
-    needs: [release-notes, create-release]
+    needs: release-notes
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -113,3 +103,14 @@ jobs:
         run: |
           yarn electron-vite build
           yarn electron-builder --win --publish always
+
+  create-release:
+    needs: [release-notes, build-linux, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ needs.release-notes.outputs.changelog }}
+          generate_release_notes: true
+          update_existing: true

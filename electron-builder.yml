@@ -64,6 +64,9 @@ linux:
     - from: binaries/7zzs
     - from: binaries/umu/umu-run
   target:
+    - target: AppImage
+      arch:
+        - x64
     - target: deb
       arch:
         - x64
