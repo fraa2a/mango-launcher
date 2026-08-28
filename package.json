@@ -1,6 +1,6 @@
 {
   "name": "mango-launcher",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Mango Launcher",
   "main": "./out/main/index.js",
   "author": "fraa2a",
