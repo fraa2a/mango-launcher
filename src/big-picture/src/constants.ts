@@ -1,4 +1,4 @@
-import { Downloader } from "@shared";
+import { Downloader, TAXPHOBIA_DOWNLOAD_SOURCE_NAME } from "@shared";
 
 export const IS_BROWSER =
   globalThis.self !== undefined &&
@@ -23,4 +23,5 @@ export const DOWNLOADER_NAME: Record<Downloader, string> = {
   [Downloader.Rootz]: "Rootz",
   [Downloader.Premiumize]: "Premiumize",
   [Downloader.AllDebrid]: "AllDebrid",
+  [Downloader.TaxPhobia]: TAXPHOBIA_DOWNLOAD_SOURCE_NAME,
 };

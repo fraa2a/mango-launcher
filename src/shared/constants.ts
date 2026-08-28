@@ -12,6 +12,7 @@ export enum Downloader {
   Rootz = 11,
   Premiumize = 12,
   AllDebrid = 13,
+  TaxPhobia = 14,
 }
 
 export enum DownloadSourceStatus {
@@ -77,6 +78,8 @@ export enum DownloadError {
   TorrentTooManyFiles = "download_error_torrent_too_many_files",
   TorrentFilesUnavailable = "download_error_torrent_files_unavailable",
 }
+
+export const TAXPHOBIA_DOWNLOAD_SOURCE_NAME = "TaxPhobia - Lodatori";
 
 export const FILE_EXTENSIONS_TO_EXTRACT = [".rar", ".zip", ".7z"];
 

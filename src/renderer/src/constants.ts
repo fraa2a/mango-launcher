@@ -1,4 +1,4 @@
-import { Downloader } from "@shared";
+import { Downloader, TAXPHOBIA_DOWNLOAD_SOURCE_NAME } from "@shared";
 
 export const DOWNLOADER_NAME = {
   [Downloader.RealDebrid]: "Real-Debrid",
@@ -14,6 +14,7 @@ export const DOWNLOADER_NAME = {
   [Downloader.Rootz]: "Rootz",
   [Downloader.Premiumize]: "Premiumize",
   [Downloader.AllDebrid]: "AllDebrid",
+  [Downloader.TaxPhobia]: TAXPHOBIA_DOWNLOAD_SOURCE_NAME,
 };
 
 export const MAX_MINUTES_TO_SHOW_IN_PLAYTIME = 120;

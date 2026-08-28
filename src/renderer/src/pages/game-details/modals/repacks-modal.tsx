@@ -19,7 +19,7 @@ import type { DownloadSource, Game, GameRepack } from "@types";
 
 import { DownloadSettingsModal } from "./download-settings-modal";
 import { gameDetailsContext } from "@renderer/context";
-import { Downloader } from "@shared";
+import { Downloader, TAXPHOBIA_DOWNLOAD_SOURCE_NAME } from "@shared";
 import { orderBy } from "lodash-es";
 import { useDate, useAppDispatch, useAppSelector } from "@renderer/hooks";
 import { clearNewDownloadOptions } from "@renderer/features";
@@ -141,7 +141,15 @@ export function RepacksModal({
   }, [visible, game, dispatch]);
 
   const sortedRepacks = useMemo(() => {
-    return orderBy(repacks, [(repack) => repack.uploadDate], ["desc"]);
+    return orderBy(
+      repacks,
+      [
+        (repack) =>
+          repack.downloadSourceName === TAXPHOBIA_DOWNLOAD_SOURCE_NAME ? 0 : 1,
+        (repack) => repack.uploadDate,
+      ],
+      ["asc", "desc"]
+    );
   }, [repacks]);
 
   const getRepackAvailabilityStatus = (

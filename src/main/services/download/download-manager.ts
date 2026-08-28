@@ -1076,6 +1076,8 @@ export class DownloadManager {
         return this.getVikingFileDownloadOptions(download, resumingFilename);
       case Downloader.Rootz:
         return this.getRootzDownloadOptions(download, resumingFilename);
+      case Downloader.TaxPhobia:
+        return this.getTaxPhobiaDownloadOptions(download, resumingFilename);
       default:
         return null;
     }
@@ -1411,6 +1413,23 @@ export class DownloadManager {
     );
     return this.buildDownloadOptions(
       downloadUrl,
+      download.downloadPath,
+      filename
+    );
+  }
+
+  private static getTaxPhobiaDownloadOptions(
+    download: Download,
+    resumingFilename?: string
+  ) {
+    const filename = this.resolveFilename(
+      resumingFilename,
+      download.uri,
+      download.uri
+    );
+
+    return this.buildDownloadOptions(
+      download.uri,
       download.downloadPath,
       filename
     );
