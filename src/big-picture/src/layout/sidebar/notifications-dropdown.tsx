@@ -50,7 +50,7 @@ import type {
   NotificationsResponse,
 } from "@types";
 
-const mangoIconUrl = new URL("../../assets/mango-icon.svg", import.meta.url)
+const mangoIconUrl = new URL("../../assets/mango-icon.png", import.meta.url)
   .href;
 const DROPDOWN_OFFSET = 16;
 const DROPDOWN_REGION_ID = "sidebar-notifications-dropdown-region";

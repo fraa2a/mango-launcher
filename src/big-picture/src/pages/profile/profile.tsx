@@ -151,7 +151,7 @@ type ProfileHeroAction = {
   onClick: () => void;
 };
 
-const mangoIconUrl = new URL("../../assets/mango-icon.svg", import.meta.url)
+const mangoIconUrl = new URL("../../assets/mango-icon.png", import.meta.url)
   .href;
 const WEEKLY_BAR_PLACEHOLDER = [
   { day: "monday", label: "M", height: 0.62 },

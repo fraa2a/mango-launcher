@@ -63,11 +63,11 @@
     right: calc(globals.$spacing-unit * 2);
     z-index: 10;
 
-    svg {
+    img {
       width: 28px;
       height: 28px;
-      fill: globals.$body-color;
-      opacity: 0.6;
+      object-fit: contain;
+      opacity: 0.8;
     }
   }
 

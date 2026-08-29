@@ -3,7 +3,7 @@ import type { UserAchievement } from "@types";
 import { useTranslation } from "react-i18next";
 import "./achievements.scss";
 import { EyeClosedIcon } from "@primer/octicons-react";
-import MangoIcon from "@renderer/assets/icons/mango.svg?react";
+import mangoIcon from "@renderer/assets/icons/mango.png";
 
 interface AchievementListProps {
   achievements: UserAchievement[];
@@ -59,7 +59,11 @@ export function AchievementList({
                   points: achievement.points,
                 })}
               >
-                <MangoIcon className="achievements__item-points-icon" />
+                <img
+                  src={mangoIcon}
+                  alt=""
+                  className="achievements__item-points-icon"
+                />
                 <p className="achievements__item-points-value">
                   {achievement.points}
                 </p>
@@ -69,7 +73,11 @@ export function AchievementList({
                 className="achievements__item-points achievements__item-points--locked"
                 title={t("achievement_earn_points", { points: "???" })}
               >
-                <MangoIcon className="achievements__item-points-icon" />
+                <img
+                  src={mangoIcon}
+                  alt=""
+                  className="achievements__item-points-icon"
+                />
                 <p className="achievements__item-points-value">???</p>
               </span>
             )}

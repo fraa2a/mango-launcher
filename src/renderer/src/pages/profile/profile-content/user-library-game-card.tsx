@@ -1,5 +1,5 @@
 import { UserGame } from "@types";
-import MangoIcon from "@renderer/assets/icons/mango.svg?react";
+import mangoIcon from "@renderer/assets/icons/mango.png";
 import {
   useFormat,
   useToast,
@@ -277,7 +277,7 @@ export function UserLibraryGameCard({
                             transform: `translateY(${-100 * (statIndex % getStatsItemCount())}%)`,
                           }}
                         >
-                          <MangoIcon width={16} height={16} />
+                          <img src={mangoIcon} alt="" width={16} height={16} />
                           {formatAchievementPoints(
                             game.achievementsPointsEarnedSum
                           )}

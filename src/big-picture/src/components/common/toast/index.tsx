@@ -41,7 +41,7 @@ interface BigPictureToastProps extends BigPictureToastCardProps {
 }
 
 const INITIAL_PROGRESS = 100;
-const mangoIconUrl = new URL("../../../assets/mango-icon.svg", import.meta.url)
+const mangoIconUrl = new URL("../../../assets/mango-icon.png", import.meta.url)
   .href;
 const DEFAULT_FALLBACK_VISUAL: BigPictureToastFallbackVisual = "mango";
 

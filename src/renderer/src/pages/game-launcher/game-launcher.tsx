@@ -7,7 +7,7 @@ import {
   TrophyIcon,
   ToolsIcon,
 } from "@primer/octicons-react";
-import MangoIcon from "@renderer/assets/icons/mango.svg?react";
+import mangoIcon from "@renderer/assets/icons/mango.png";
 import { MAX_MINUTES_TO_SHOW_IN_PLAYTIME } from "@renderer/constants";
 import { darkenColor } from "@renderer/helpers";
 import { logger } from "@renderer/logger";
@@ -290,7 +290,7 @@ export default function GameLauncher() {
       <div className="game-launcher__glow" style={glowStyle} />
 
       <div className="game-launcher__logo-badge">
-        <MangoIcon />
+        <img src={mangoIcon} alt="Mango Launcher" />
       </div>
 
       <div className="game-launcher__content">

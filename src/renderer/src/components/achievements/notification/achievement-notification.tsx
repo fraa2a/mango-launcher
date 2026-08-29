@@ -3,7 +3,7 @@ import {
   AchievementNotificationInfo,
 } from "@types";
 import cn from "classnames";
-import MangoIcon from "@renderer/assets/icons/mango.svg?react";
+import mangoIcon from "@renderer/assets/icons/mango.png";
 import { EyeClosedIcon } from "@primer/octicons-react";
 import Ellipses from "@renderer/assets/icons/ellipses.png";
 import "./achievement-notification.scss";
@@ -33,7 +33,11 @@ export function AchievementNotificationItem({
     >
       {achievement.points !== undefined && (
         <div className="achievement-notification__chip">
-          <MangoIcon className="achievement-notification__chip__icon" />
+          <img
+            src={mangoIcon}
+            alt=""
+            className="achievement-notification__chip__icon"
+          />
           <span className="achievement-notification__chip__label">
             +{achievement.points}
           </span>

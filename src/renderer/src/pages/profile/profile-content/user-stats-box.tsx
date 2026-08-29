@@ -3,7 +3,7 @@ import { userProfileContext } from "@renderer/context";
 import { useTranslation } from "react-i18next";
 import { useFormat, useUserDetails } from "@renderer/hooks";
 import { MAX_MINUTES_TO_SHOW_IN_PLAYTIME } from "@renderer/constants";
-import MangoIcon from "@renderer/assets/icons/mango.svg?react";
+import mangoIcon from "@renderer/assets/icons/mango.png";
 import { useSubscription } from "@renderer/hooks/use-subscription";
 import { ClockIcon, TrophyIcon } from "@primer/octicons-react";
 import { Award } from "lucide-react";
@@ -73,7 +73,7 @@ export function UserStatsBox() {
             {userStats.achievementsPointsEarnedSum !== undefined ? (
               <div className="user-stats__stats-row">
                 <p className="user-stats__list-description">
-                  <MangoIcon width={20} height={20} />
+                  <img src={mangoIcon} alt="" width={20} height={20} />
                   {numberFormatter.format(
                     userStats.achievementsPointsEarnedSum.value
                   )}
