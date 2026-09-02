@@ -194,7 +194,7 @@ export default function Home() {
                     />
 
                     <div className="home__leaderboard-info">
-                      <span className="home__leaderboard-title">
+                      <span className="home__leaderboard-game-title">
                         {game.title}
                       </span>
                       <span className="home__leaderboard-playtime">

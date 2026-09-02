@@ -66,7 +66,7 @@
 
   @media (max-width: 900px) {
     &__split {
-      flex-direction: column;
+      grid-template-columns: minmax(0, 1fr);
     }
 
     &__leaderboard {
@@ -74,19 +74,32 @@
       padding-left: 0;
       border-top: 1px solid globals.$border-color;
       padding-top: calc(globals.$spacing-unit * 3);
+      position: static;
+    }
+  }
+
+  @media (max-width: 640px) {
+    &__split {
+      gap: calc(globals.$spacing-unit * 2.5);
+      padding-inline: calc(globals.$spacing-unit * 2);
+    }
+
+    &__recent-scroll {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: globals.$spacing-unit;
     }
   }
 
   &__split {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.42fr);
+    align-items: start;
     gap: calc(globals.$spacing-unit * 3);
     padding: 0 calc(globals.$spacing-unit * 3);
-    padding-bottom: calc(globals.$spacing-unit * 3);
+    padding-bottom: calc(globals.$spacing-unit * 4);
   }
 
   &__recent {
-    flex: 1 1 65%;
     display: flex;
     flex-direction: column;
     gap: calc(globals.$spacing-unit * 2);
@@ -100,44 +113,42 @@
   }
 
   &__recent-scroll {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: calc(globals.$spacing-unit * 1.5);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
   }
 
   &__recent-card {
-    height: 130px;
-    flex-shrink: 0;
-    width: auto;
-    border-radius: 4px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
     border: none;
     padding: 0;
     background: none;
     text-align: left;
-    scroll-snap-align: start;
-    transition: transform 0.15s ease;
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
 
     &:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 18px -10px rgba(0, 0, 0, 0.8);
     }
 
     &:focus-visible {
       outline: 2px solid var(--color-primary);
-      outline-offset: 2px;
+      outline-offset: 3px;
     }
   }
 
   &__recent-art {
     height: 100%;
-    width: auto;
-    aspect-ratio: 16 / 9;
+    width: 100%;
     background-size: cover;
     background-position: center;
     background-color: globals.$dark-background-color;
-    border-radius: 4px;
     position: relative;
     display: flex;
     align-items: flex-end;
@@ -146,8 +157,7 @@
   &__recent-art-overlay {
     width: 100%;
     padding: calc(globals.$spacing-unit * 1.5);
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
-    border-radius: 0 0 4px 4px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent 78%);
   }
 
   &__recent-card-title {
@@ -165,13 +175,14 @@
   }
 
   &__leaderboard {
-    flex: 0 0 35%;
     display: flex;
     flex-direction: column;
     gap: calc(globals.$spacing-unit * 2);
     min-width: 0;
     border-left: 1px solid globals.$border-color;
     padding-left: calc(globals.$spacing-unit * 3);
+    position: sticky;
+    top: 0;
   }
 
   &__leaderboard-title {
@@ -240,7 +251,7 @@
     flex: 1;
   }
 
-  &__leaderboard-title {
+  &__leaderboard-game-title {
     font-size: 14px;
     font-weight: 700;
     overflow: hidden;
